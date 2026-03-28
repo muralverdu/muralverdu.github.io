@@ -90,17 +90,32 @@
 
     .info-box {
         position: relative; 
-        width: 80vw;
+        width: 70vw;
+        max-width: 100%;
         margin: 12px auto;
-        height: 30%;   
+        height: 20vh;
+        max-height: 20vh;
         overflow-y: auto;
         
-        background: #f9f9f9;
         border: 1px solid #ccc;
         border-radius: 8px;
         padding: 15px;
         z-index: 10;
         box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+
+    .info-box.visible {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    .invisible {
+        visibility: hidden;
+        opacity: 0;
     }
 
     #info-text {
@@ -108,10 +123,6 @@
         font-size: 14px;
         line-height: 1.5;
         color: #333;
-    }
-
-    .invisible {
-        display: none;
     }
 
     #mural path {
@@ -188,7 +199,6 @@
         text-align: center;
         margin: 0;
         padding: 10px 0;
-        /* transition: all 0.3s ease; */
         transition: font-size 0.3s ease, padding 0.3s ease, box-shadow 0.3s ease;
     }
 
@@ -287,6 +297,85 @@
         0%, 100% { transform: translateY(0); }
         50%       { transform: translateY(6px); }
     }
+
+    @media (min-width: 768px) {
+
+    #header {
+        width: 70vw;
+        height: 50vh;
+        max-width: 1200px;
+    }
+
+    #titol h1 {
+        font-size: 1.8rem;
+    }
+
+    #mural-text-wrap {
+        width: 70vw;
+        max-width: 1200px;
+        height: auto;
+        min-height: unset;
+        display: flex;
+        flex-direction: column;
+    }
+
+    #mural-container {
+        flex-shrink: 0;
+        height: auto;
+        aspect-ratio: 1389 / 1103;
+        max-height: 60vh;
+    }
+
+    #mural {
+        width: 100%;
+        height: 100%;
+    }
+
+    .info-box {
+        width: 70vw;
+        max-width: 1200px;
+        flex-shrink: 0;
+        height: 18vh;
+        max-height: 18vh;
+        font-size: 15px;
+    }
+
+    #nav {
+        width: 70vw;
+        max-width: 1200px;
+    }
+
+    #info-text {
+        font-size: 15px;
+        line-height: 1.6;
+    }
+}
+
+@media (min-width: 1200px) {
+
+    #header {
+        width: 60vw;
+        height: 45vh;
+    }
+
+    #mural-text-wrap {
+        width: 60vw;
+    }
+
+    #mural-container {
+        max-height: 65vh;
+    }
+
+    .info-box {
+        width: 60vw;
+        height: 18vh;
+        max-height: 18vh;
+    }
+
+    #nav {
+        width: 60vw;
+    }
+}
     
 </style>
 
@@ -380,7 +469,7 @@
                     </g>
                 </svg>
             </div>
-            <div class="info-box invisible">
+            <div class="info-box">
                 <p id="info-text"></p>
             </div>
         </div>
@@ -429,7 +518,7 @@ function seleccionarSeccio(index) {
     mural.classList.add("difuminat");
     seccions.forEach(s => s.classList.remove("seleccionada"));
     seccions[index].classList.add("seleccionada");
-    infoBox.classList.remove("invisible");
+    infoBox.classList.add("visible");
     infoText.textContent = textSeccions[index];
     infoBox.scrollTop = 0;
 
@@ -508,7 +597,7 @@ function deseleccionarTot() {
     seccioActual = -1;
     mural.classList.remove("difuminat");
     seccions.forEach(s => s.classList.remove("seleccionada"));
-    infoBox.classList.add("invisible");
+    infoBox.classList.remove("visible");
 
     const svgEl = document.getElementById("mural");
     svgEl.style.width = "100%";
