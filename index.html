@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mural ceràmic d'Enric Orobich Verdú</title>
+    <link rel="shortcut icon" href="escut_verdu.png" type="image/x-icon">
+</head>
+<style>
+
+    body {
+        font-family: Verdana, Geneva, Tahoma, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+
+        background: linear-gradient(180deg, #f7eae0 0%, #ffffff 100%);
+        background-attachment: fixed;
+        min-height: 100vh;
+    }
+
+    #header {
+        display: flex;
+        flex-direction: column;
+        width: 80vw;
+        height: 70vh;
+    }
+
+    #studio {
+        display:flex;
+        justify-content: space-between;
+        width: 100%;
+        font-weight: bold;
+    }
+
+    #titol {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+    }
+
+    #info {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+    }
+
+    #header p {
+        text-align: center;
+    }
+
+    #mural-text-wrap {
+        width: 100%;
+        height: 80vh;
+        min-height: 80vh;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    #mural-container {
+        width: 100%;
+        height: 70%;   
+        overflow: auto;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        position: relative;
+    }
+
+    #mural {
+        display: block;
+        width: 100%;
+        height: auto;
+    }
+
+    #mural-g {
+        transform-origin: 0 0;
+    }
+
+    #nav {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px;
+    }
+
+    .info-box {
+        position: relative; 
+        width: 80vw;
+        margin: 12px auto;
+        height: 30%;   
+        overflow-y: auto;
+        
+        background: #f9f9f9;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        padding: 15px;
+        z-index: 10;
+        box-shadow: inset 0 0 5px rgba(0,0,0,0.05);
+    }
+
+    #info-text {
+        margin: 0;
+        font-size: 14px;
+        line-height: 1.5;
+        color: #333;
+    }
+
+    .invisible {
+        display: none;
+    }
+
+    #mural path {
+        fill: transparent;
+        stroke-width: 5px;
+    }
+
+    #mural path:hover {
+        fill: rgba(255, 166, 0, 0.2);
+        cursor: pointer;
+    }
+
+    #mural image {
+        filter: drop-shadow(0px 10px 15px rgba(0, 0, 0, 0.6));
+    }
+
+    #img_mural {
+        filter: none;
+        transition: opacity 0.3s ease;
+    }
+
+    #mural.difuminat path {
+        fill: rgba(0, 0, 0, 0.5);
+        stroke: rgba(255, 255, 255, 0.2);
+        transition: all 0.3s ease;
+    }
+
+    #mural.difuminat path.seleccionada {
+        fill: transparent; 
+        stroke: white;
+        stroke-width: 4px;
+        filter: drop-shadow(0 0 10px rgba(255,255,255,0.5));
+    }
+
+    #mural path:hover {
+        cursor: pointer;
+        fill: rgba(255, 255, 255, 0.1);
+    }
+
+    button {
+        background-color: white;
+        color: black;
+        border: 1px solid black;
+        border-radius: 24px;
+        padding: 10px 18px;
+        font-size: 14px;
+        font-family: inherit;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+
+    button:hover {
+        background-color: black;
+        color: white;
+    }
+
+    button:focus {
+        outline: none;
+        background-color: white;
+        color: black;
+    }
+
+    button:focus svg {
+        stroke: white;
+    }
+
+    #titol h1 {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background: linear-gradient(180deg, #f7eae0 0%, #ffffff 100%);
+        background-attachment: fixed;
+        width: 100vw;
+        text-align: center;
+        margin: 0;
+        padding: 10px 0;
+        /* transition: all 0.3s ease; */
+        transition: font-size 0.3s ease, padding 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    #titol h1.fixat {
+        font-size: 1.2rem;
+        padding: 5px 0;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    #context-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+        margin-top: 20px;
+    }
+
+    #overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.5);
+        z-index: 1000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+    }
+
+    #overlay.obert {
+        opacity: 1;
+        pointer-events: all;
+    }
+
+    #btn-tancar {
+        position: absolute;
+        top: 16px;
+        right: 16px;
+        background: none;
+        border: none;
+        font-size: 1.2rem;
+        cursor: pointer;
+        padding: 4px 8px;
+        color: #555;
+    }
+
+    #btn-tancar:hover {
+        background: none;
+        color: #000;
+    }
+
+    #overlay-content {
+        background: white;
+        border-radius: 12px;
+        padding: 40px;
+        max-width: 640px;
+        width: 90vw;
+        max-height: 80vh;
+        overflow-y: auto;
+        position: relative;
+        font-size: 0.95rem;
+        line-height: 1.8;
+        color: #333;
+        text-align: justify;
+    }
+
+    #overlay-content h2 {
+        margin-top: 0;
+        margin-bottom: 24px;
+        font-size: 1.2rem;
+        text-align: center;
+    }
+
+    #overlay-content p {
+        margin-bottom: 1.2em;
+    }
+
+    /* Botó de scroll */
+    #btn-scroll {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 4px;
+        display: block;
+        margin: 0 auto;
+        animation: bounce 2s ease-in-out infinite;
+    }
+
+    #btn-scroll:hover {
+        background: none;
+        color: #333;
+    }
+
+    @keyframes bounce {
+        0%, 100% { transform: translateY(0); }
+        50%       { transform: translateY(6px); }
+    }
+    
+</style>
+
+<body>    
+        <div id="header">
+            <!-- <div id="studio">
+                <p>app feta per:</p>
+                <p>elporuc.studio</p>
+            </div> -->
+            <div id="titol">
+                <h1>El somi d'Enric Orobich, Verdú</h1>
+                <!-- Bloc de context -->
+
+                <div id="info">
+                    <div id="context-container">
+                        <p id="text-resum">Informació sobre el mural...</p>
+                        <button id="btn-llegir">Llegir més</button>
+                    </div>
+
+                        <button id="btn-scroll" aria-label="Baixar al contingut">
+                            <svg fill="currentColor" width="24" height="24" viewBox="0 0 970.586 970.586" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M44.177,220.307l363.9,296.4c22.101,18,48.9,27,75.8,27c26.901,0,53.701-9,75.801-27l366.699-298.7
+                                    c51.4-41.9,59.101-117.4,17.2-168.8c-41.8-51.4-117.399-59.1-168.8-17.3l-290.901,237l-288.1-234.7c-51.4-41.8-127-34.1-168.8,17.3
+                                    C-14.923,102.907-7.123,178.407,44.177,220.307z"/>
+                                <path d="M44.177,642.207l363.9,296.399c22.101,18,48.9,27,75.8,27c26.901,0,53.701-9,75.801-27l366.699-298.7
+                                    c51.4-41.899,59.101-117.399,17.2-168.8c-41.899-51.399-117.399-59.1-168.8-17.2l-290.901,236.9l-288.1-234.6
+                                    c-51.4-41.9-127-34.101-168.8,17.199C-14.923,524.807-7.123,600.406,44.177,642.207z"/>
+                            </svg>
+                    </button>
+                </div>
+
+                <!-- Overlay fora del header -->
+                <div id="overlay">
+                    <div id="overlay-content">
+                        <button id="btn-tancar">✕</button>
+                        <h2>Sobre el mural</h2>
+                        <p>
+                            El mural inicia amb el somni d'un nadó —una figura que simbòlicament representa l'Enric i la
+                            seva visió— i, a partir d'aquí, s'obre tot un món oníric de vida, natura, història i crítica. Aquest
+                            somni ens condueix per escenes carregades de símbols, animals, paisatges, oficis i reflexions
+                            sobre el pas del temps. Concretament, ens porta cap a la Fira d'animals de peu rodó, que durant
+                            molts anys va ser un dels pilars econòmics de Verdú i un espai d'intercanvi vital per a la vila i
+                            el seu entorn rural.
+                        </p>
+                        <p>
+                            Aquest mural es podria llegir com dividit en dues grans parts: La meitat inferior ens parla de
+                            la relació amb la terra: les feines del camp, les estacions de l'any, la convivència amb els
+                            animals del territori, el pas del temps i la transformació dels oficis. És una mirada empàtica als
+                            orígens, però també crítica amb els canvis. La meitat superior, en canvi, gira entorn de la fira i
+                            els espais on es realitzava la compravenda. Aquesta part del mural mostra la vida social i
+                            econòmica lligada als animals de peu rodó —ases, mules, cavalls—, que no només eren eines
+                            de treball, sinó també protagonistes del dia a dia de la vida rural.
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+        <div id="mural-text-wrap">
+            <div id="mural-container">
+                <svg id="mural" viewBox="0 0 1389 1103" xmlns="http://www.w3.org/2000/svg">
+                    <g id="mural-g">
+                        <image id="img_mural" href="mural_final.svg" />
+                        <path id="sup_esquerra" 
+                            d="M47 276V232.5V229H73.5L88.5 236.5L114.5 223L236.5 220L269.5 232.5L312.5 238L315 232.5H334L367.5 214L401 223L404.5 227H460.5V232.5L487 227L504.5 235L516 229L585.5 223L635.5 196L678.5 193V132L681.5 35L733 5V487.5L730.5 566.5H684L672.5 573.5H542L515.5 592.5L480.5 581.5H273L261.5 616.5L237.5 623.5L194.5 616.5L167.5 592L73.5 588L67.5 609.5L34 602V515L37 488.5L6.5 458.5L1 447H8.5L41 460.5L37 436.5L41 354.5L47 276Z"
+                            fill="transparent"/>
+                        <path id="sup_dreta" 
+                            d="M734.5 488V5L778 42L781.5 212.5L823 207.5H832.5L854.5 213.5L872 217.5L885 213.5L886.5 201H899.5L901.5 220.5H906L928 229.5L932.5 225.5L977 216L1007 213.5V76L1010 74L1011.5 58.5L1035 47.5H1056.5L1077.5 52L1095.5 67L1100.5 188L1121.5 181V148L1148 132L1163.5 135.5L1197 113L1227.5 122.5L1247 117V91L1264 61.5L1266.5 25V7.5H1300L1294.5 38L1309 58.5L1316.5 82L1330 75L1323 61.5V52.5H1330L1343 72.5L1353.5 75L1362 513V597L1336.5 580L1301 571L1214 578.5L1113 580L1104 574L966.5 577L942.5 584L914.5 577L822.5 582L780.5 577L774 570.5L732 566L734.5 488Z"
+                            fill="transparent"/>
+                        <path id="seccio_7"
+                            d="M890 897L885 875L961 859L1033.5 862.5C1067.83 865.833 1138.3 872.5 1145.5 872.5H1190L1201.5 880L1250.5 885.5L1308 877L1354 858.5L1367.5 846L1364 919.5L1370.5 1001.5V1041L1334 1049L1201.5 1059.5L1063 1067.5L890 1075L896 966L890 897Z"
+                            fill="transparent" />
+                        <path id="seccio_6"
+                            d="M1215 591.5V580.5L1255.5 577L1299.5 572.5L1335 580.5L1362 598L1366 623L1362 647.5L1366 721.5V842.5C1362.67 846.667 1355.3 855.4 1352.5 857C1349.7 858.6 1327.67 867.333 1317 871.5L1251 883L1203.5 878.5L1194.5 871.5L1203.5 862.5V833.5L1191.5 733.5V721.5L1194.5 676L1215 632.5L1199 618V608L1215 591.5Z"
+                            fill="transparent" />
+                        <path id="seccio_5"
+                            d="M998.5 627L1014.5 611L1028 592.5L1024.5 580L1102 577C1104.33 578 1109.5 580.5 1111.5 582.5C1113.5 584.5 1179.67 581.667 1212.5 580V589.5L1196.5 607V619L1212.5 632L1192.5 675.5V690L1188 728.5L1201.5 833V860L1190 867.5H1105L1042.5 860L963.5 856.5L988 813L1003 784.5L1009.5 761.5L1003 748L1011.5 681.5L998.5 652V627Z"
+                            fill="transparent" />
+                        <path id="seccio_3"
+                            d="M517 595L541.5 575.5H672L684.5 568L772.5 571L780 578.5L824 583L914.5 578.5L940.5 585.5V596L925 624.5L914.5 716C904 730.5 890.5 733.1 890.5 735.5C890.5 737.9 861 763.833 848 772L863.5 814.5V837L868 846L887 896L894 963.5L891.5 1023.5L887 1072.5L771 1092.5L726 1096.5L587.5 1092.5L590.5 914.5L617 887V858L562 849L524 820.5V780L532 735.5L509.5 679.5L517 645V595Z"
+                            fill="transparent" />
+                        <path id="seccio_4"
+                            d="M968.5 580C983 580.333 1013.1 580.8 1017.5 580H1021L1025.5 592L1010 612L996 625V652.5L1010 681.5L1001 748L1007.5 762L1004.5 776.5C999.5 785 989.1 802.5 987.5 804.5C985.9 806.5 984.5 815 984 819L956.5 857L884 870.5L867 836.5V816L851.5 772L884 748L893.5 735.5L916.5 718L928 625L943.5 598.5V586.5L968.5 580Z"
+                            fill="transparent" />
+                        <path id="seccio_2"
+                            d="M22 949L35 604.5L69.5 611L75.5 588.5L165 593.5L194 618L238 624.5L263 618L274 582.5H480L514.5 593.5V624.5C514.5 629.7 495.833 648.667 486.5 657.5L454.5 680L390 684L370 695H345L330 714L335 774L350.5 800.5L385 818.5L390 837L379.5 844.5L341 852.5L308 886L289 928L280.5 981.5L289 1073L22 1051V949Z"
+                            fill="transparent" />
+                        <path id="seccio_1"
+                            d="M369 699L387 688.5L456 684.5L479.5 668.5L512.5 645.5L506 679.5L528 733L520.5 780.5V822.5L561 853.5L613.5 860.5V881C608.333 887.667 596.9 902.1 592.5 906.5C588.1 910.9 562.333 908.333 550 906.5L532 1092L453 1098L429 1087H397L372 1083L331.5 1087L290.5 1069L282.5 988.5L290.5 933L309.5 887L344 853.5L382 845L393.5 836.5L387 817.5L354.5 799L339 773.5L331.5 733V714L344 699H369Z"
+                            fill="transparent" />
+                    </g>
+                </svg>
+            </div>
+            <div class="info-box invisible">
+                <p id="info-text"></p>
+            </div>
+        </div>
+    
+    <div id="nav"> 
+        <button id="anterior">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M19 12H5M11 19l-7-7 7-7"/>
+            </svg>
+        </button>
+        
+        <button id="start-stop">Començar</button> 
+        
+        <button id="seguent">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M5 12h14M13 5l7 7-7 7"/>
+            </svg>
+        </button>
+    </div>
+</body>
+<script> 
+
+const textSeccions = [
+   "La primera imatge que apareix en el somni són les pintures rupestres, evocant les coves d'Altamira. Aquest moment inicial no només marca l'inici de la vida humana, sinó també l'inici de la capacitat de representar, narrar, i entendre el nostre entorn. Recorda que aquelles persones tenien una sensibilitat diferent, una manera d'estar al món que, amb el temps, hem anat perdent. Al voltant del nadó hi trobem animals que reforcen el vincle entre l'entorn i la vida humana: les formigues, que evoquen el treball i la lluita per la supervivència; un eriçó i un llangardaix, record d'una espècie avui gairebé desapareguda; i una serp, lluny que qualsevol connotació negativa, representada de manera pacífica i plena de significat.",
+   "La primera escena del mural ens situa a l'hivern, i per tant les feines del camp pròpies d'aquesta estació. Just per sobre de les pintures rupestres hi veiem un pastor amb el seu ramat de corders, acompanyat del gos d'atura. Al voltant, els arbres canvien de tonalitat, un detall que situa l'escena dins el cicle natural de l'any. Just a la part esquerra de l'olivera s'hi representa el pagès llaurant el camp amb l'ajuda de la mula: l'arada obre els solcs preparant la terra per al nou cicle agrícola. En aquesta escena no podia faltar la collita de l'oliva. L'oliver apareix envoltat de les borrasses per recollir el fruit, trobem també els sacs, preparats per emmagatzemar-les; i l'escala, tradicionalment dit com banc d'olivers, recolzada contra l'arbre, ens recorda la manera tradicional de collir-les a mà. A més, un home baixa pel marge de pedra seca carregant els sacs. Mentrestant, i si mirem una mica més baix, una parella prepara una cassola de tros, un àpat senzill i compartit que acompanyava les llargues jornades de feina al camp. Just damunt d'ells, un home recull cargols per afegir-los a la cassola. Enmig de l'escena, ho observa una mula amb un somriure simpàtic, possiblement com a referència festiva a la Mulassa.",
+   "Entrem a la primavera, i amb ella les feines de segar, sembrar i batre. En la part superior d'aquesta escena veiem la feina de segar representada per un home que treballa ajupit recollint les garbes que simbolitzen el mètode tradicional de la feina al camp, una imatge que remet a segles de vida rural gairebé inalterada. Al costat del pagès tradicional hi irromp la presència de la segadora mecànica, introduint-nos a la industrialització. Aquesta irrupció inquieta el sisó i la seva cria, ocells que ponen els seus nius entre els cultius i que d'alguna manera vol mostrar el contrast entre natura i mecanització i ens recorda com les eines modernes poden alterar l'equilibri de l'entorn, animals i paisatge. La semblant tensió es veu en la perdiu sobre la teulada de la masia, que protegeix els seus pollets. L'Enric ha volgut incloure tots els animals significatius de l'entorn per mostrar-los just en el moment en què la vida humana i la natural es toquen i s'interpel·len. Amb l'arribada de la primavera, el mural ens presenta una escena nítida on un home sembra les llavors que carrega a l'esportí i que marca l'inici del nou cicle agrícola. La imatge és simple, però carregada de significat perquè mostra el moment exacte en què la terra es prepara per donar vida després dels mesos d'hivern. A la part més baixa del conjunt hi trobem l'escena de batre, situada sota les perdius i representada en un relleu invers que crea un efecte visual fosc i profund. Aquesta elecció no és només estètica: respon també a la necessitat de reforçar la zona inferior del mural, que és la més delicada.",
+   "L'escena incorpora, de nou, animals del nostre entorn: un rusc actiu i una abella pol·linitzant flors, mostrant el paper essencial d'aquests insectes en la reproducció de les plantes. Just al costat hi apareixen porcs senglars, un alimentant-se i altres en plena reproducció, evidenciant les funcions bàsiques del cicle vital. La presència conjunta d'aquests elements reflecteix tres processos bàsics del camp: la pol·linització, l'alimentació i la continuïtat de l'espècie.",
+   "La idea de fer una escena nocturna és una de les primeres idees que l'Enric va imaginar pel mural, i que, amb el temps, va anar prenent forma. La proposta del Josep Riera d'incorporar els satèl·lits de Musk, en un inici, li va semblar descabellada a l'autor, però a mesura que l'escena avançava aquests elements van acabar integrant-se com un contrast entre la natura i un element futurista que contrasta amb la línia del mural. Enmig d'aquest paisatge apareix un carro acompanyat dels animals de la nit —el mussol, les llebres, el llop, la guineu i una rata— tots ells amb caràcter silenciós i misteriós. A un costat hi apareix una figura visitant i discreta, que sembla comunicar-se amb els animals. Aquesta figura femenina podria resumir la idea central de l'escena: la nit com un espai on les fronteres entre espècies s'esvaeixen i la natura manté una vida pròpia que sovint ens passa desapercebuda.",
+   "Aquesta escena l'Enric tenia clar que d'alguna manera o altra l'havia de representar, ho protagonitza una dona que simbolitza la Mare Naturalesa sostenint un peix mort, obert per dins i ple de quitrà i fragments de plàstic. El peix, amb l'interior buit i contaminat, denuncia el deteriorament del medi ambient i fa referència directa al desastre del vaixell Prestige del 2002, que va abocar tones de residus petroliers a la costa gallega. L'Enric hi va col·laborar com a voluntari ajudant a retirar el petroli de les platges. La peça està feta amb la tècnica ceràmica rakú, un procediment d'origen oriental en què el resultat final depèn de la temperatura, els esmalts i la cocció, i que no es pot modificar un cop acabat. Tot i que la intencionalitat de l'Enric era un fons més clar i esperançador, la peça va acabar adquirint tons foscos i metal·litzats que reforcen el missatge de degradació ambiental. Al voltant de la Mare Naturalesa apareixen diversos dracs que, tot i poder semblar una amenaça, simbolitzen alhora la protecció; no són dracs agressius, sinó guardians d'un món que lluita per recuperar-se. La figura avança damunt d'una tortuga, símbol de lentitud que recorda que la regeneració de la natura és un procés llarg i fràgil, de la mateixa manera que també ho és la destrucció massiva.",
+   "La part inferior del mural apareix l'escena de la tardor, representada pel temps de vinya. La portadora, amb el raïm carregat, evoca la manera tradicional de veremar, mentre que la veremadora mecanitzada situada al costat mostra el sistema modern. Aquest contrast entre passat i present resumeix, un cop més, l'evolució de les feines del camp i la transformació de la verema al llarg del temps. A la dreta hi trobem Bacus, el déu del vi, símbol de la festa i la xerinola, la part que completa el binomi tan propi dels catalans, el seny i la rauxa, i que alhora connecta amb les celebracions tradicionals de Verdú, concretament amb el nostre Bacus. Al costat de Bacus hi apareix la figura autobiogràfica proposada per l'Eduard Boleda, una referència a la seva vinculació amb la música. Totes dues figures es presenten sota una posta de sol pròpia de Ponent.",
+   "La part nord-oest del mural correspon al carrer Firal Pere III, l'espai principal on tenia lloc la compravenda durant la fira. Aquest carrer concentrava gran part de l'activitat i era el lloc de trobada entre pagesos, tractants i visitants. La fira reunia una multitud de gent que superava l'afluència de les festes més grans del poble. Les mules eren les grans protagonistes del carrer: n'hi havia pertot arreu, juntament amb carros, tractants i gent que omplia tot l'espai. Aquesta intensa activitat va marcar el creixement del carrer i d'una part del poble. Moltes de les cases que hi trobem daten dels segles XVIII i XIX, l'època en què la fira va viure el seu moment de màxim esplendor. A Verdú hi arribava gent de molts indrets: de tot el país, també de l'Aragó, de la muntanya o de Lleida. La fira es va convertir en una de les més importants del país, amb competència amb altres fires destacades com la de Salàs de Pallars.",
+   "A la cara nord-est del mural apareix una escena situada davant de la plaça Major, ja que l'activitat de la fira no es limitava només al carrer Firal. A la Plaça Major hi havia moviment que completava l'ambient de fira: paradetes, torronaires, carros… En aquest espai s'hi representen diversos vehicles de l'època aparcats, entre els quals destaca un tractor que també apareix en alguns dels vídeos dels últims anys de la fira. De fet, la mecanització del camp va ser una de les causes que van acabar provocant la desaparició d'aquesta fira d'animals. El penúltim vehicle de l'esquerra és una caravana d'un firaire adaptada per viure-hi durant els diez que durava. Al davant de la façana de l'ajuntament hi apareixen diverses mules, una d'elles alada, continuant amb l'element oníric que travessa tot el mural.Just al darrere té lloc la que s'anomena la conversa impossible. Hi apareixen tres personatges: el senyor Po —el senyor Fonoll—, amb barret de copa, conversant amb el gallinaire, i entre tots dos un tercer personatge d'esquena que aixeca el dit mentre intervé en la conversa i que recorda la figura de Jordi Pujol.Just al darrere hi ha un home amb un diari, aparentment discret, que observa l'escena. Tot i la seva actitud dissimulada, té un paper imprescindible al mural, es tracta de l'Enric Orobich.",
+]
+
+
+const seccions = [seccio_1, seccio_2, seccio_3, seccio_4, seccio_5, seccio_6, seccio_7, sup_esquerra, sup_dreta];
+const mural = document.getElementById("mural");
+const infoBox = document.querySelector(".info-box");
+const infoText = document.getElementById("info-text");
+let seccioActual = -1;
+
+function seleccionarSeccio(index) {
+    if (index < 0 || index >= seccions.length) return;
+
+    seccioActual = index;
+    mural.classList.add("difuminat");
+    seccions.forEach(s => s.classList.remove("seleccionada"));
+    seccions[index].classList.add("seleccionada");
+    infoBox.classList.remove("invisible");
+    infoText.textContent = textSeccions[index];
+    infoBox.scrollTop = 0;
+
+    zoomASeccio(index);
+}
+
+const MURAL_ASPECT = 1103 / 1389;
+
+function zoomASeccio(index) {
+    const bbox = seccions[index].getBBox();
+    const padding = 80;
+    const container = document.getElementById("mural-container");
+    const containerW = container.clientWidth;
+    const containerH = container.clientHeight;
+
+    const bboxW = bbox.width + padding * 2;
+    const bboxH = bbox.height + padding * 2;
+
+    const scale = Math.min(containerW / bboxW, containerH / bboxH, 3);
+
+    const newW = 1389 * scale;
+    const newH = 1103 * scale;
+
+    const cx = (bbox.x + bbox.width / 2) * scale;
+    const cy = (bbox.y + bbox.height / 2) * scale;
+
+    const targetLeft = Math.max(0, cx - containerW / 2);
+    const targetTop  = Math.max(0, cy - containerH / 2);
+
+    const svgEl = document.getElementById("mural");
+
+    const oldW = svgEl.clientWidth;
+    const oldH = svgEl.clientHeight;
+    const oldScrollLeft = container.scrollLeft;
+    const oldScrollTop  = container.scrollTop;
+
+    const oldCX = (oldScrollLeft + containerW / 2) / (oldW / 1389);
+    const oldCY = (oldScrollTop  + containerH / 2) / (oldH / 1103);
+
+    svgEl.style.width  = newW + "px";
+    svgEl.style.height = newH + "px";
+
+    const compensatedLeft = oldCX * (newW / 1389) - containerW / 2;
+    const compensatedTop  = oldCY * (newH / 1103) - containerH / 2;
+
+    container.scrollLeft = compensatedLeft;
+    container.scrollTop  = compensatedTop;
+
+    const startLeft = compensatedLeft;
+    const startTop  = compensatedTop;
+    const diffLeft  = targetLeft - startLeft;
+    const diffTop   = targetTop  - startTop;
+    const duration  = 600;
+    let startTime   = null;
+
+    function easeInOut(t) {
+        return t < 0.5 ? 2 * t * t : -1 + (4 - 2 * t) * t;
+    }
+
+    function step(timestamp) {
+        if (!startTime) startTime = timestamp;
+        const elapsed  = timestamp - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const ease     = easeInOut(progress);
+
+        container.scrollLeft = startLeft + diffLeft * ease;
+        container.scrollTop  = startTop  + diffTop  * ease;
+
+        if (progress < 1) requestAnimationFrame(step);
+    }
+
+    requestAnimationFrame(step);
+}
+
+function deseleccionarTot() {
+    seccioActual = -1;
+    mural.classList.remove("difuminat");
+    seccions.forEach(s => s.classList.remove("seleccionada"));
+    infoBox.classList.add("invisible");
+
+    const svgEl = document.getElementById("mural");
+    svgEl.style.width = "100%";
+    svgEl.style.height = "auto";
+}
+
+// Clic sobre les seccions del mural
+document.addEventListener("click", (event) => {
+    const seccioClicada = seccions.find(s => s === event.target);
+
+    if (seccioClicada) {
+        seleccionarSeccio(seccions.indexOf(seccioClicada));
+        document.getElementById("start-stop").textContent = "Parar";
+    } else if (!event.target.closest("#nav")) {
+        deseleccionarTot();
+        document.getElementById("start-stop").textContent = "Començar";
+    }
+});
+
+// Botó Start/Stop
+document.getElementById("start-stop").addEventListener("click", () => {
+    if (seccioActual === -1) {
+        seleccionarSeccio(0);
+        document.getElementById("start-stop").textContent = "Parar";
+    } else {
+        deseleccionarTot();
+        document.getElementById("start-stop").textContent = "Començar";
+    }
+});
+
+// Fletxa anterior
+document.getElementById("anterior").addEventListener("click", (e) => {
+    e.currentTarget.blur(); 
+    if (seccioActual === -1) {
+        seleccionarSeccio(seccions.length - 1);
+    } else {
+        seleccionarSeccio((seccioActual - 1 + seccions.length) % seccions.length);
+    }
+    document.getElementById("start-stop").textContent = "Parar";
+});
+
+// Fletxa següent
+document.getElementById("seguent").addEventListener("click", (e) => {
+    e.currentTarget.blur();
+    if (seccioActual === -1) {
+        seleccionarSeccio(0);
+    } else {
+        seleccionarSeccio((seccioActual + 1) % seccions.length);
+    }
+    document.getElementById("start-stop").textContent = "Parar";
+});
+
+// Scroll per al títol fix
+window.addEventListener("scroll", () => {
+    const titolH1 = document.querySelector("#titol h1");
+    const fixat = titolH1.classList.contains("fixat");
+    
+    if (!fixat && window.scrollY > 60) {
+        titolH1.classList.add("fixat");
+    } else if (fixat && window.scrollY < 40) {
+        titolH1.classList.remove("fixat");
+    }
+});
+
+const btnLlegir = document.getElementById("btn-llegir");
+const overlay = document.getElementById("overlay");
+const btnTancar = document.getElementById("btn-tancar");
+
+btnLlegir.addEventListener("click", () => {
+    overlay.classList.add("obert");
+    document.body.style.overflow = "hidden";
+});
+
+btnTancar.addEventListener("click", () => {
+    overlay.classList.remove("obert");
+    document.body.style.overflow = "";
+});
+
+overlay.addEventListener("click", (e) => {
+    if (e.target === overlay) {
+        overlay.classList.remove("obert");
+        document.body.style.overflow = "";
+    }
+});
+
+// Botó de scroll per baixar al mural.
+document.getElementById("btn-scroll").addEventListener("click", () => {
+    document.getElementById("mural-container").scrollIntoView({ behavior: "smooth" });
+});
+
+//Pujar al principi quan es fa clic al titol.
+document.querySelector("#titol h1").addEventListener("click", () => {
+    window.scrollTo({ top: 0, behavior: "smooth" });
+});
+
+</script>
+</html>
